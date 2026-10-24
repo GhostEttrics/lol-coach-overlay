@@ -37,10 +37,11 @@ export const defaultSettings: UserSettings = {
     elo_filter: null,
     queue_timeout_s: null,
   },
-  overlay: { click_through: true, position: null, minimized: false, silent: false, scale: 1, corner: "top-left" },
+  overlay: { click_through: true, position: null, minimized: false, silent: false, scale: 1, corner: "top-left", show_tips: true },
   last_role: null,
   panel_cards: {},
   notify: { sound_affordable: false, voice: false },
+  open_panel_on_start: true,
 };
 
 function merge(s: Partial<UserSettings> | null | undefined): UserSettings {

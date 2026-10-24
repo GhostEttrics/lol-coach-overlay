@@ -13,10 +13,19 @@ import { useEngineLog } from "./useEngineLog";
 import { findMe, findPlayerByName, samePlayer } from "@/engine/role";
 import type { GameEvent, UserSettings } from "@/types";
 
-export function useBootstrap(opts: { engine?: boolean } = {}): { lastEvent: GameEvent | null } {
+export function useBootstrap(opts: { engine?: boolean; overlay?: boolean } = {}): { lastEvent: GameEvent | null } {
   const setSettings = useStore((s) => s.setSettings);
   const setInteractive = useStore((s) => s.setInteractive);
+  const inGame = useStore((s) => s.inGame);
   const [lastEvent, setLastEvent] = useState<GameEvent | null>(null);
+
+  // Overlay host only: clickable out of game (so the user can click buttons
+  // and open the panel), pass-through once a game starts (so it doesn't block
+  // gameplay). F1 still toggles this anytime within a game.
+  useEffect(() => {
+    if (!opts.overlay) return;
+    invoke("set_click_through", { enabled: inGame }).catch(() => {});
+  }, [opts.overlay, inGame]);
 
   // Settings: initial pull + stay in sync with other windows.
   useEffect(() => {

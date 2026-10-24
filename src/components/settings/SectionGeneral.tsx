@@ -1,5 +1,5 @@
 import { useStore } from "@/store";
-import { SectionCard, Row, Seg, patchSettings } from "./widgets";
+import { SectionCard, Row, Seg, Toggle, patchSettings } from "./widgets";
 import type { Lang, Theme } from "@/types";
 import { t } from "@/i18n";
 
@@ -21,6 +21,9 @@ export function SectionGeneral() {
           options={[{ v: "dark", l: t(lang, "themeDark") }, { v: "light", l: t(lang, "themeLight") }]}
           onChange={(v) => patchSettings((s) => ((s.theme = v), s))}
         />
+      </Row>
+      <Row label={t(lang, "openPanelOnStart")} hint={t(lang, "openPanelOnStartHint")}>
+        <Toggle value={settings.open_panel_on_start} onChange={(v) => patchSettings((s) => ((s.open_panel_on_start = v), s))} />
       </Row>
     </SectionCard>
   );

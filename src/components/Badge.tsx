@@ -13,8 +13,13 @@ function fmtK(n: number): string {
   return `${sign}${Math.round(abs)}`;
 }
 
-export function AdvantageBadge({ live }: { live: LiveSnapshot }) {
-  const { tempo, diff } = tempoOf(live);
+export function AdvantageBadge({ live, diff: diffProp }: { live?: LiveSnapshot; diff?: number }) {
+  const { tempo, diff } = live
+    ? tempoOf(live)
+    : {
+        diff: diffProp ?? 0,
+        tempo: (diffProp ?? 0) > 1500 ? "ahead" : (diffProp ?? 0) < -1500 ? "behind" : "even",
+      } as const;
   return (
     <span
       key={tempo}

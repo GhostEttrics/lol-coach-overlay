@@ -9,16 +9,20 @@ import type { Lang } from "@/types";
 export function GoldBar({
   current,
   total,
+  needed,
   effectiveCost,
   lang,
 }: {
   current: number;
-  total: number;
-  effectiveCost: number;
+  total?: number;
+  needed?: number;
+  effectiveCost?: number;
   lang: Lang;
 }) {
-  const safeTotal = Math.max(1, total);
-  const invested = Math.max(0, total - effectiveCost);
+  const resolvedTotal = total ?? needed ?? 1;
+  const safeTotal = Math.max(1, resolvedTotal);
+  const resolvedEffective = effectiveCost ?? resolvedTotal;
+  const invested = Math.max(0, resolvedTotal - resolvedEffective);
   const have = invested + current;
   const ratio = Math.min(1, Math.max(0, have / safeTotal));
   const bg = ratio >= 1 ? "bg-ok" : ratio >= 0.8 ? "bg-warn" : "bg-danger";
@@ -27,7 +31,7 @@ export function GoldBar({
     <div className="w-full">
       <div className="flex items-baseline justify-between text-[10px] mb-0.5">
         <span className={clsx("font-mono tabular-nums", ratio >= 1 ? "text-ok" : "text-white/55")}>
-          {fmtGold(lang, Math.min(have, total))} / {fmtGold(lang, total)}g
+          {fmtGold(lang, Math.min(have, resolvedTotal))} / {fmtGold(lang, resolvedTotal)}g
         </span>
         {invested > 0 ? (
           <span className="text-white/40">{t(lang, "ownedParts", { g: fmtGold(lang, invested) })}</span>

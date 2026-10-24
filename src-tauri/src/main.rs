@@ -11,7 +11,7 @@ mod window_setup;
 
 use serde::{Deserialize, Serialize};
 use state::AppState;
-use std::sync::Arc;
+use std::sync::{atomic::Ordering, Arc};
 use tauri::{Manager, WindowEvent};
 
 // serde(default) everywhere: a settings.json written by an older build must
@@ -29,6 +29,7 @@ pub struct UserSettings {
     // Panel card id -> enabled. Missing id = enabled.
     pub panel_cards: serde_json::Value,
     pub notify: Notify,
+    pub open_panel_on_start: bool,
 }
 
 impl Default for UserSettings {
@@ -43,6 +44,7 @@ impl Default for UserSettings {
             last_role: None,
             panel_cards: serde_json::json!({}),
             notify: Notify::default(),
+            open_panel_on_start: true,
         }
     }
 }
@@ -247,8 +249,12 @@ fn main() {
                 if let Err(e) = window_setup::apply_overlay_window_styles(&win) {
                     tracing::warn!("overlay window style setup failed: {e}");
                 }
-                let _ = win.set_ignore_cursor_events(true);
+                // Interactive by default so the overlay is clickable before a
+                // match. The frontend flips to click-through when a game
+                // starts, and F1 toggles it anytime.
+                let _ = win.set_ignore_cursor_events(false);
                 let _ = win.set_always_on_top(true);
+                state.interactive.store(true, Ordering::Relaxed);
                 #[cfg(debug_assertions)]
                 win.close_devtools();
             }
@@ -257,6 +263,11 @@ fn main() {
 
             if let Err(e) = ui::install_tray(app) {
                 tracing::warn!("tray install failed: {e}");
+            }
+
+            // Open the dashboard on launch unless the user turned it off.
+            if state.settings.read().open_panel_on_start {
+                ui::show_window(app.handle(), "panel");
             }
 
             let s = state.clone();

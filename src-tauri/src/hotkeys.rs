@@ -1,13 +1,13 @@
 // Global hotkeys (GetAsyncKeyState polling, 50ms).
 //
-//   Ctrl+F1       overlay interactive on/off (click-through)
-//   F2 / F3       overlay view: item / draft
-//   F4            silent mode
-//   F6            minimize / expand the overlay (chip <-> widget)
-//   Ctrl+Shift+O  open / close the panel
+//   F1 or Ctrl+F1  overlay interactive on/off (click-through)
+//   F2 / F3        overlay view: item / draft
+//   F4             silent mode
+//   F6             minimize / expand the overlay (chip <-> widget)
+//   Ctrl+Shift+O   open / close the panel
 //
 // Plain F2-F4 are only taken when Ctrl and Shift are up. Note: League binds
-// F1-F5 to camera-on-ally by default, so F2-F4 also move the game camera.
+// F1-F5 to camera-on-ally by default, so these also move the game camera.
 
 use tauri::AppHandle;
 
@@ -31,7 +31,8 @@ pub async fn install(app: AppHandle) {
         let shift = down(VK_SHIFT.0 as i32);
         let plain = !ctrl && !shift;
         let now = [
-            ctrl && !shift && down(VK_F1.0 as i32),
+            // F1 and Ctrl+F1 both toggle interactive (Shift+F1 ignored).
+            !shift && down(VK_F1.0 as i32),
             plain && down(VK_F2.0 as i32),
             plain && down(VK_F3.0 as i32),
             plain && down(VK_F4.0 as i32),

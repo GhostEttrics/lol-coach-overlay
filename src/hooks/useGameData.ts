@@ -39,6 +39,8 @@ export interface GameData {
   champName: string;
   champIcon: string | null;
   rec: ItemRecommendation | null;
+  itemIcon?: string;
+  goldDiff: number;
   balance: StateBalance | null;
   tempoDiff: number;
   objective: ObjectiveCall | null;
@@ -55,6 +57,8 @@ const EMPTY: GameData = {
   champName: "",
   champIcon: null,
   rec: null,
+  itemIcon: undefined,
+  goldDiff: 0,
   balance: null,
   tempoDiff: 0,
   objective: null,
@@ -83,6 +87,7 @@ export function useGameData(lastEvent: GameEvent | null = null): GameData {
     const threat = computeThreat(live, patch);
     const st = objectiveState(live, patch);
     const opp = laneOpponent(live, patch, role.role);
+    const rec = recommendNextItem({ live, patch, role: role.role, lang, clientSet });
 
     const icon = (p: PlayerShort) => {
       const c = champOf(p, patch);
@@ -94,7 +99,9 @@ export function useGameData(lastEvent: GameEvent | null = null): GameData {
       me,
       champName: champ?.name ?? me.championName,
       champIcon: champ ? `${patch.cdn}/img/champion/${champ.image.full}` : null,
-      rec: recommendNextItem({ live, patch, role: role.role, lang, clientSet }),
+      rec,
+      itemIcon: rec?.iconUrl,
+      goldDiff: tempoOf(live).diff,
       balance: balanceState(live, role.role, lang),
       tempoDiff: tempoOf(live).diff,
       objective: objectiveCall(st, role.role, lang),

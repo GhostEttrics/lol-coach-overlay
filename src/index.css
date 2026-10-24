@@ -4,33 +4,18 @@
 
 :root {
   color-scheme: dark;
-  /* Design tokens exposed as CSS vars so a future theme switch can swap them. */
-  --panel-bg: 10 14 22;
-  --panel-border: 255 255 255;
-  --glow-primary: 0 212 255;
-  --accent: 0 212 255;
-  --ok: 74 222 128;
-  --warn: 251 191 36;
-  --danger: 248 113 113;
 }
 
-html,
-body,
-#root {
+html, body, #root {
   height: 100%;
   margin: 0;
-  padding: 0;
   font-family: "Inter", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+#root { display: block; min-height: 100%; }
 
-#root {
-  display: block;
-  min-height: 100%;
-}
-
-/* Overlay window: fully transparent so only the glass panel paints. */
+/* Overlay: transparente */
 html[data-window="overlay"],
 html[data-window="overlay"] body,
 html[data-window="overlay"] #root {
@@ -39,123 +24,86 @@ html[data-window="overlay"] #root {
   user-select: none;
   -webkit-user-select: none;
 }
-
-/* Panel and settings are normal opaque windows. */
-html[data-window="panel"],
-html[data-window="settings"],
-html[data-window="panel"] body,
-html[data-window="settings"] body {
-  background: #0a0e16;
+/* Painel/Config: opacos */
+html[data-window="panel"], html[data-window="settings"],
+html[data-window="panel"] body, html[data-window="settings"] body {
+  background: #070a10;
   color: #fff;
 }
+html:not([data-window]) body { background: #070a10; }
 
-/* Default (dev / unknown label): dark so nothing flashes white. */
-html:not([data-window]) body {
-  background: #0a0e16;
-}
-
-/* Glass panel. Primary surface for the overlay. */
+/* ===== Superfícies premium ===== */
 .glass {
-  background: rgba(10, 14, 22, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(160deg, rgba(18,24,36,0.85), rgba(9,13,20,0.82));
+  border: 1px solid rgba(255,255,255,0.09);
   box-shadow:
-    0 0 24px rgba(0, 180, 255, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 8px 32px -4px rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(12px) saturate(140%);
-  -webkit-backdrop-filter: blur(12px) saturate(140%);
+    0 0 0 1px rgba(0,212,255,0.05),
+    0 0 40px rgba(0,180,255,0.10),
+    inset 0 1px 0 rgba(255,255,255,0.07),
+    0 16px 48px -12px rgba(0,0,0,0.7);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
 }
+.card-surface {
+  background: linear-gradient(160deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.card-hover {
+  transition: transform .22s cubic-bezier(.4,0,.2,1), box-shadow .22s, border-color .22s;
+}
+.card-hover:hover {
+  transform: translateY(-3px);
+  border-color: rgba(0,212,255,0.4);
+  box-shadow:
+    0 0 0 1px rgba(0,212,255,0.18),
+    0 0 32px rgba(0,180,255,0.16),
+    inset 0 1px 0 rgba(255,255,255,0.07);
+}
+.glow-cyan  { box-shadow: 0 0 0 1px rgba(0,212,255,0.35), 0 0 22px rgba(0,212,255,0.28); }
+.glow-green { box-shadow: 0 0 0 1px rgba(74,222,128,0.35), 0 0 22px rgba(74,222,128,0.28); }
+.text-glow  { text-shadow: 0 0 14px rgba(0,212,255,0.45); }
 
-/* Drag region (header). */
-.drag {
-  -webkit-app-region: drag;
-  app-region: drag;
-  cursor: grab;
-}
-.drag:active {
-  cursor: grabbing;
-}
-
-/* Opt-out of the drag region (buttons, links). */
-.no-drag {
-  -webkit-app-region: no-drag;
-  app-region: no-drag;
-}
+/* Drag region */
+.drag { -webkit-app-region: drag; cursor: grab; }
+.drag:active { cursor: grabbing; }
+.no-drag { -webkit-app-region: no-drag; }
 
 /* Scrollbar */
-::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 2px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,0.35); }
+::-webkit-scrollbar-track { background: transparent; }
 
-/* Soft pulse for timers nearing expiry / LIVE indicators. */
-@keyframes pulse-soft {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.45;
-  }
-}
-.animate-pulse-soft {
-  animation: pulse-soft 1.4s ease-in-out infinite;
-}
+/* ===== Animações ===== */
+@keyframes pulse-soft { 0%,100%{opacity:1} 50%{opacity:.4} }
+.animate-pulse-soft { animation: pulse-soft 1.4s ease-in-out infinite; }
 
-/* Priority pulse ring on buyable item icon. */
 @keyframes pulse-ring {
-  0% {
-    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.55);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(74, 222, 128, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0);
-  }
+  0%   { box-shadow: 0 0 0 0 rgba(74,222,128,0.5); }
+  70%  { box-shadow: 0 0 0 12px rgba(74,222,128,0); }
+  100% { box-shadow: 0 0 0 0 rgba(74,222,128,0); }
 }
-.pulse-ring {
-  animation: pulse-ring 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
+.pulse-ring { animation: pulse-ring 1.8s cubic-bezier(.4,0,.6,1) infinite; }
 
-/* Fade + slide-in used by swapped item cards and suggestion rows. */
 @keyframes fade-slide-in {
-  0% {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  0%   { opacity:0; transform:translateY(6px); }
+  100% { opacity:1; transform:translateY(0); }
 }
-.fade-slide-in {
-  animation: fade-slide-in 150ms ease-out both;
+.fade-slide-in { animation: fade-slide-in .28s cubic-bezier(.4,0,.2,1) both; }
+
+@keyframes badge-pop { 0%{transform:scale(1)} 50%{transform:scale(1.15)} 100%{transform:scale(1)} }
+.badge-pop { animation: badge-pop .25s ease-out; }
+
+@keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+.shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(0,212,255,0.14) 50%, rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2.6s linear infinite;
 }
 
-/* Scale pop for badges that change state. */
-@keyframes badge-pop {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.12); }
-  100% { transform: scale(1); }
-}
-.badge-pop {
-  animation: badge-pop 200ms ease-out;
-}
+@keyframes bar-grow { from { width: 0; } }
+.bar-grow { animation: bar-grow .8s cubic-bezier(.4,0,.2,1) both; }
 
-/* Keep inputs usable even when the overlay is otherwise click-through
-   gated: when the user chooses interactive mode, they get standard input
-   affordances. */
-input,
-textarea {
-  color: #fff;
-}
-input::placeholder {
-  color: rgba(255, 255, 255, 0.25);
-}
+input, textarea { color: #fff; }
+input::placeholder { color: rgba(255,255,255,0.25); }

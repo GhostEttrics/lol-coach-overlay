@@ -17,6 +17,8 @@ export interface UserSettings {
   // Panel card id -> enabled. A missing id means enabled.
   panel_cards: Record<string, boolean>;
   notify: Notify;
+  // Open the dashboard window automatically on launch.
+  open_panel_on_start: boolean;
 }
 
 export interface Notify {
@@ -41,6 +43,8 @@ export interface OverlaySettings {
   silent: boolean;
   scale: number;
   corner: OverlayCorner;
+  // Show one priority tip line inside the overlay (the full list is in the panel).
+  show_tips: boolean;
 }
 
 export type Role = "TOP" | "JUNGLE" | "MIDDLE" | "BOTTOM" | "UTILITY";

@@ -1,11 +1,9 @@
-// The dashboard grid of cards (mockup #1). Content is real engine output; a
-// few cards show a placeholder when not in game.
-
+// Dashboard grid of rich cards. Content is real engine output; cards show
+// a placeholder when not in game.
 import clsx from "clsx";
 import { useStore } from "@/store";
 import { Card } from "./Card";
-import { GoldBar } from "@/components/GoldBar";
-import { fmtGold, t, tx } from "@/i18n";
+import { fmtGold, t } from "@/i18n";
 import type { GameData } from "@/hooks/useGameData";
 
 export function PanelGrid({ data }: { data: GameData }) {
@@ -14,30 +12,55 @@ export function PanelGrid({ data }: { data: GameData }) {
   const autoBuy = useStore((s) => s.settings.automation.auto_buy);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-      <Card id="item" title={t(lang, "cardItem.title")} description={t(lang, "cardItem.desc")}>
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+      {/* Próximo Item */}
+      <Card
+        id="item"
+        title="Próximo Item"
+        description="Roda de itens recomendados para o seu campeão."
+      >
         {data.rec ? (
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-3">
-              <img src={data.rec.iconUrl} alt="" className="w-12 h-12 rounded-xl ring-1 ring-white/10" />
-              <div className="min-w-0">
-                <div className="text-[15px] font-semibold truncate">{data.rec.name}</div>
-                <div className="text-[12px] text-white/50">{fmtGold(lang, data.rec.gold)}g · {stageLabel(data, lang)}</div>
+          <div className="flex items-center gap-3">
+            <div className="h-11 w-11 shrink-0 overflow-hidden rounded-lg ring-1 ring-cyan-400/30">
+              <img
+                src={data.itemIcon ?? data.rec.iconUrl}
+                alt={data.rec.name}
+                className="h-full w-full object-cover"
+              />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-[13px] font-semibold text-white">
+                {data.rec.name}
+              </div>
+              <div className="text-[11px] text-amber-300/90">
+                {fmtGold(lang, data.rec.gold)}g · {stageLabel(data, lang)}
+              </div>
+              <div className="mt-1 text-[10.5px] leading-snug text-white/50">
+                {data.rec.reason}
               </div>
             </div>
-            <GoldBar current={data.me ? (useStore.getState().live?.activePlayer.currentGold ?? 0) : 0} total={data.rec.gold} effectiveCost={data.rec.effectiveCost} lang={lang} />
-            <div className="text-[11px] text-white/50">{data.rec.reason}</div>
           </div>
         ) : (
           <Empty lang={lang} />
         )}
       </Card>
 
-      <Card id="coach" title={t(lang, "cardCoach.title")} description={t(lang, "cardCoach.desc")}>
+      {/* Dicas do Coach */}
+      <Card
+        id="tips"
+        title="Dicas do Coach"
+        description="Dicas em tempo real para melhorar sua tomada de decisão."
+      >
         {data.tips.length ? (
-          <ul className="flex flex-col gap-2">
+          <ul className="flex flex-col gap-1.5">
             {data.tips.slice(0, 3).map((tip) => (
-              <li key={tip.id} className={clsx("rounded-lg px-3 py-2 text-[12px] leading-snug ring-1", sev(tip.severity))}>
+              <li
+                key={tip.id}
+                className={clsx(
+                  "rounded-lg px-2.5 py-1.5 text-[11px] leading-snug ring-1",
+                  sev(tip.severity)
+                )}
+              >
                 {tip.message}
               </li>
             ))}
@@ -47,34 +70,49 @@ export function PanelGrid({ data }: { data: GameData }) {
         )}
       </Card>
 
-      <Card id="objectives" title={t(lang, "cardObj.title")} description={t(lang, "cardObj.desc")}>
+      {/* Objetivos */}
+      <Card
+        id="objectives"
+        title="Objetivos"
+        description="Timers de dragão, barão e objetivos globais."
+      >
         {inGame ? (
           <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-4 text-[13px]">
-              <span className="text-white/60">🐉 {data.dragonScore.mine}x{data.dragonScore.enemy}</span>
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="text-white/60">🐉 Dragão</span>
+              <span className="font-semibold tabular-nums text-white">
+                {data.dragonScore.mine}x{data.dragonScore.enemy}
+              </span>
             </div>
-            {data.objective ? (
-              <div className={clsx("rounded-lg px-3 py-2 text-[12px] ring-1", sev(data.objective.severity))}>{data.objective.text}</div>
-            ) : (
-              <div className="text-[12px] text-white/40">{t(lang, "noObjectiveSoon")}</div>
-            )}
+            <div className="rounded-lg bg-white/[0.03] px-2.5 py-1.5 text-[11px] text-white/70 ring-1 ring-white/10">
+              {data.objective ? data.objective.text : t(lang, "noObjectiveSoon")}
+            </div>
           </div>
         ) : (
           <Empty lang={lang} />
         )}
       </Card>
 
-      <Card id="gold" title={t(lang, "cardGold.title")} description={t(lang, "cardGold.desc")}>
-        {inGame ? <GoldDiff diff={data.tempoDiff} lang={lang} /> : <Empty lang={lang} />}
+      {/* Vantagem de Ouro */}
+      <Card
+        id="gold"
+        title="Vantagem de Ouro"
+        description="Visualize a diferença de ouro entre sua equipe e a inimiga."
+      >
+        {inGame ? <GoldDiff diff={data.goldDiff} lang={lang} /> : <Empty lang={lang} />}
       </Card>
 
-      <Card id="winCondition" title={t(lang, "cardWin.title")} description={t(lang, "cardWin.desc")}>
+      {/* Condição de Vitória */}
+      <Card
+        id="wincond"
+        title="Condição de Vitória"
+        description="Saiba o que precisa fazer para garantir a vitória."
+      >
         {data.balance ? (
-          <div className="flex flex-col gap-1.5">
-            <div className="text-[13px] text-white/90 leading-snug">{data.balance.winCondition}</div>
-            <div className="text-[11px] text-white/50">
-              <span className="text-white/35">{t(lang, "priority")}: </span>
-              {data.balance.priority}
+          <div className="flex flex-col gap-1 text-[11px]">
+            <div className="text-white/80">{data.balance.winCondition}</div>
+            <div className="text-white/50">
+              {t(lang, "priority")}: {data.balance.priority}
             </div>
           </div>
         ) : (
@@ -82,14 +120,31 @@ export function PanelGrid({ data }: { data: GameData }) {
         )}
       </Card>
 
-      <Card id="threats" title={t(lang, "cardThreats.title")} description={t(lang, "cardThreats.desc")}>
+      {/* Ameaças */}
+      <Card
+        id="threats"
+        title="Ameaças"
+        description="Veja os campeões inimigos e seus níveis de ameaça."
+      >
         {data.threats.length ? (
-          <div className="flex items-end gap-3">
-            {data.threats.map((th) => (
-              <div key={th.name} className="flex flex-col items-center gap-1 w-12">
-                <img src={th.icon} alt="" className="w-9 h-9 rounded-full ring-1 ring-white/10" title={th.name} />
-                <div className="w-full h-1 rounded-full bg-white/10 overflow-hidden">
-                  <div className={clsx("h-full rounded-full", th.weight > 0.6 ? "bg-danger" : th.weight > 0.4 ? "bg-warn" : "bg-accent")} style={{ width: `${th.weight * 100}%` }} />
+          <div className="flex flex-col gap-2">
+            {data.threats.map((th, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <span className="w-16 truncate text-[11px] text-white/70">
+                  {th.name}
+                </span>
+                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/10">
+                  <div
+                    className={clsx(
+                      "h-full rounded-full",
+                      th.weight > 0.6
+                        ? "bg-danger"
+                        : th.weight > 0.4
+                          ? "bg-warn"
+                          : "bg-accent"
+                    )}
+                    style={{ width: `${th.weight * 100}%` }}
+                  />
                 </div>
               </div>
             ))}
@@ -99,25 +154,40 @@ export function PanelGrid({ data }: { data: GameData }) {
         )}
       </Card>
 
-      <Card id="laneMatchup" title={t(lang, "cardLane.title")} description={t(lang, "cardLane.desc")}>
+      {/* Meu Laner */}
+      <Card
+        id="lane"
+        title="Meu Laner"
+        description="Informações do confronto na rota e dicas de overlay."
+      >
         {inGame && data.lane?.opp ? (
-          <div className="flex items-center justify-between gap-2">
-            <ChampFace icon={data.lane.meIcon} name={data.lane.meName} tint="accent" />
-            <div className="flex flex-col items-center text-[10px] text-white/50">
-              <span className={clsx(data.lane.csDiff >= 0 ? "text-ok" : "text-danger")}>{data.lane.csDiff >= 0 ? "+" : ""}{data.lane.csDiff} CS</span>
-              <span className="text-white/30 text-[13px] font-bold">vs</span>
-              <span className="text-white/40">{t(lang, "lvl")} {data.lane.me.level}·{data.lane.opp.level}</span>
-            </div>
-            <ChampFace icon={data.lane.oppIcon} name={data.lane.oppName} tint="danger" />
+          <div className="flex items-center justify-between text-[11px]">
+            <span
+              className={clsx(
+                "font-semibold",
+                data.lane.csDiff >= 0 ? "text-ok" : "text-danger"
+              )}
+            >
+              {data.lane.csDiff >= 0 ? "+" : ""}
+              {data.lane.csDiff} CS
+            </span>
+            <span className="text-white/50">
+              {t(lang, "lvl")} {data.lane.me.level}·{data.lane.opp.level}
+            </span>
           </div>
         ) : (
-          <Empty lang={lang} hint={inGame ? t(lang, "noLaneOpp") : undefined} />
+          <Empty lang={lang} />
         )}
       </Card>
 
-      <Card id="vision" title={t(lang, "cardVision.title")} description={t(lang, "cardVision.desc")}>
+      {/* Visão & Rota */}
+      <Card
+        id="vision"
+        title="Visão & Rota"
+        description="Sugestões de rota e colocação de wards."
+      >
         {data.balance ? (
-          <div className="rounded-lg bg-white/[0.03] ring-1 ring-white/5 px-3 py-2.5 text-[12px] text-white/75 leading-snug">
+          <div className="text-[11px] text-white/70">
             {data.objective?.text ?? data.balance.priority}
           </div>
         ) : (
@@ -125,12 +195,21 @@ export function PanelGrid({ data }: { data: GameData }) {
         )}
       </Card>
 
-      <Card id="autoBuy" title={t(lang, "cardAuto.title")} description={t(lang, "cardAuto.desc")}>
-        <div className="flex items-center gap-2">
-          <span className={clsx("text-[12px] px-2.5 py-1 rounded-full ring-1", autoBuy ? "bg-danger/15 text-danger ring-danger/30" : "bg-white/[0.04] text-white/50 ring-white/10")}>
+      {/* Auto-Compra */}
+      <Card
+        id="autobuy"
+        title="Auto-Compra"
+        description="Compre automaticamente os itens recomendados."
+      >
+        <div className="flex flex-col gap-1 text-[11px]">
+          <span className={autoBuy ? "text-ok" : "text-white/50"}>
             {autoBuy ? t(lang, "autoBuyOn") : t(lang, "autoBuyOff")}
           </span>
-          {data.rec && <span className="text-[11px] text-white/45 truncate">{t(lang, "suggested")}: {data.rec.name}</span>}
+          {data.rec && (
+            <span className="text-white/50">
+              {t(lang, "suggested")}: {data.rec.name}
+            </span>
+          )}
         </div>
       </Card>
     </div>
@@ -139,39 +218,57 @@ export function PanelGrid({ data }: { data: GameData }) {
 
 function stageLabel(data: GameData, lang: "pt-BR" | "en"): string {
   const r = data.rec!;
-  return r.stage === "core" ? t(lang, "stage.core", { n: r.step }) : r.stage === "boots" ? t(lang, "stage.boots") : r.stage === "start" ? t(lang, "stage.start") : t(lang, "stage.situational");
+  return r.stage === "core"
+    ? t(lang, "stage.core", { n: r.step })
+    : r.stage === "boots"
+      ? t(lang, "stage.boots")
+      : r.stage === "start"
+        ? t(lang, "stage.start")
+        : t(lang, "stage.situational");
 }
 
 function GoldDiff({ diff, lang }: { diff: number; lang: "pt-BR" | "en" }) {
   const ahead = diff >= 0;
   const pct = Math.min(1, Math.abs(diff) / 10000);
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between text-[12px]">
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-center justify-between text-[11px]">
         <span className="text-white/40">0</span>
-        <span className={clsx("font-bold font-mono", ahead ? "text-ok" : "text-danger")}>{ahead ? "+" : "-"}{fmtGold(lang, Math.abs(diff))}</span>
+        <span
+          className={clsx(
+            "font-bold tabular-nums",
+            ahead ? "text-ok" : "text-danger"
+          )}
+        >
+          {ahead ? "+" : "-"}
+          {fmtGold(lang, Math.abs(diff))}
+        </span>
       </div>
-      <div className="relative h-3 rounded-full bg-white/[0.06] overflow-hidden">
-        <div className={clsx("absolute inset-y-0", ahead ? "left-1/2 bg-ok" : "right-1/2 bg-danger")} style={{ width: `${pct * 50}%` }} />
-        <div className="absolute inset-y-0 left-1/2 w-px bg-white/20" />
+      <div className="relative h-2 overflow-hidden rounded-full bg-white/10">
+        <div
+          className={clsx(
+            "bar-grow h-full rounded-full",
+            ahead ? "bg-ok" : "bg-danger"
+          )}
+          style={{ width: `${Math.max(8, pct * 100)}%` }}
+        />
       </div>
-    </div>
-  );
-}
-
-function ChampFace({ icon, name, tint }: { icon: string; name: string; tint: "accent" | "danger" }) {
-  return (
-    <div className="flex flex-col items-center gap-1 min-w-0">
-      <img src={icon} alt="" className={clsx("w-11 h-11 rounded-full ring-2", tint === "accent" ? "ring-accent/50" : "ring-danger/50")} />
-      <span className="text-[11px] text-white/70 truncate max-w-[72px]">{name}</span>
     </div>
   );
 }
 
 function sev(s: "info" | "warn" | "crit"): string {
-  return s === "crit" ? "bg-danger/10 text-danger ring-danger/25" : s === "warn" ? "bg-warn/10 text-warn ring-warn/25" : "bg-white/[0.03] text-white/80 ring-white/10";
+  return s === "crit"
+    ? "bg-danger/10 text-danger ring-danger/25"
+    : s === "warn"
+      ? "bg-warn/10 text-warn ring-warn/25"
+      : "bg-white/[0.03] text-white/80 ring-white/10";
 }
 
 function Empty({ lang, hint }: { lang: "pt-BR" | "en"; hint?: string }) {
-  return <div className="h-full min-h-[64px] flex items-center justify-center text-[12px] text-white/30">{hint ?? t(lang, "waitingLive")}</div>;
+  return (
+    <div className="rounded-lg bg-white/[0.02] px-2.5 py-3 text-center text-[11px] text-white/35 ring-1 ring-white/5">
+      {hint ?? t(lang, "waitingLive")}
+    </div>
+  );
 }

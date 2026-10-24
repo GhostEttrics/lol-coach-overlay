@@ -45,6 +45,9 @@ export function SectionOverlay() {
           ))}
         </div>
       </Row>
+      <Row label={t(lang, "showTips")} hint={t(lang, "showTipsHint")}>
+        <Toggle value={o.show_tips} onChange={(v) => patchSettings((s) => ((s.overlay.show_tips = v), s))} />
+      </Row>
       <Row label={t(lang, "silentMode")} hint="F4">
         <Toggle value={o.silent} onChange={(v) => patchSettings((s) => ((s.overlay.silent = v), s))} />
       </Row>

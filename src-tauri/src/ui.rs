@@ -18,7 +18,7 @@ use tauri::{
 };
 
 const BASE_W: f64 = 300.0;
-const BASE_H: f64 = 214.0;
+const BASE_H: f64 = 232.0;
 const SILENT_H: f64 = 46.0;
 const CHIP: f64 = 44.0;
 const MARGIN: f64 = 16.0;
@@ -139,8 +139,7 @@ pub fn apply_overlay_layout(app: &AppHandle, prev: Option<&Overlay>, next: &Over
 pub fn play_sound() {
     #[cfg(windows)]
     unsafe {
-        use windows::Win32::System::Diagnostics::Debug::MessageBeep;
-        use windows::Win32::UI::WindowsAndMessaging::MB_ICONASTERISK;
+        use windows::Win32::UI::WindowsAndMessaging::{MessageBeep, MB_ICONASTERISK};
         let _ = MessageBeep(MB_ICONASTERISK);
     }
 }

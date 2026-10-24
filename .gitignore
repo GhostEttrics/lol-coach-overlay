@@ -1,9 +1,37 @@
-node_modules
-dist
-src-tauri/target
-src-tauri/gen
-.vscode
-.DS_Store
+# Dependências
+node_modules/
+
+# Build Rust
+src-tauri/target/
+src-tauri/gen/
+
+# Build frontend
+dist/
+dist-ssr/
+
+# Cache do app (Data Dragon por patch)
+src-tauri/cache/
+cache/
+
+# Logs
+logs/
 *.log
+src-tauri/logs/
+
+# Ambiente
 .env
+.env.local
 .env.*
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+tsconfig.tsbuildinfo
+
+# Ícones gerados (opcional, se quiser versionar, remove essa linha)
+# src-tauri/icons/*.png
