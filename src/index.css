@@ -1,0 +1,161 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  /* Design tokens exposed as CSS vars so a future theme switch can swap them. */
+  --panel-bg: 10 14 22;
+  --panel-border: 255 255 255;
+  --glow-primary: 0 212 255;
+  --accent: 0 212 255;
+  --ok: 74 222 128;
+  --warn: 251 191 36;
+  --danger: 248 113 113;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  display: block;
+  min-height: 100%;
+}
+
+/* Overlay window: fully transparent so only the glass panel paints. */
+html[data-window="overlay"],
+html[data-window="overlay"] body,
+html[data-window="overlay"] #root {
+  background: transparent !important;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Panel and settings are normal opaque windows. */
+html[data-window="panel"],
+html[data-window="settings"],
+html[data-window="panel"] body,
+html[data-window="settings"] body {
+  background: #0a0e16;
+  color: #fff;
+}
+
+/* Default (dev / unknown label): dark so nothing flashes white. */
+html:not([data-window]) body {
+  background: #0a0e16;
+}
+
+/* Glass panel. Primary surface for the overlay. */
+.glass {
+  background: rgba(10, 14, 22, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 0 24px rgba(0, 180, 255, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 8px 32px -4px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+}
+
+/* Drag region (header). */
+.drag {
+  -webkit-app-region: drag;
+  app-region: drag;
+  cursor: grab;
+}
+.drag:active {
+  cursor: grabbing;
+}
+
+/* Opt-out of the drag region (buttons, links). */
+.no-drag {
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Soft pulse for timers nearing expiry / LIVE indicators. */
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+.animate-pulse-soft {
+  animation: pulse-soft 1.4s ease-in-out infinite;
+}
+
+/* Priority pulse ring on buyable item icon. */
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(74, 222, 128, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0);
+  }
+}
+.pulse-ring {
+  animation: pulse-ring 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Fade + slide-in used by swapped item cards and suggestion rows. */
+@keyframes fade-slide-in {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.fade-slide-in {
+  animation: fade-slide-in 150ms ease-out both;
+}
+
+/* Scale pop for badges that change state. */
+@keyframes badge-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+.badge-pop {
+  animation: badge-pop 200ms ease-out;
+}
+
+/* Keep inputs usable even when the overlay is otherwise click-through
+   gated: when the user chooses interactive mode, they get standard input
+   affordances. */
+input,
+textarea {
+  color: #fff;
+}
+input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
